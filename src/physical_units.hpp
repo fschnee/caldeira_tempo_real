@@ -1,0 +1,18 @@
+#pragma once
+
+#include <vector>
+
+#include "messages.hpp"
+
+class physical_units {
+public:
+    auto get_messages() -> std::vector<messages::to_program::any>
+    {
+        return {};
+    }
+
+    auto process_messages(const std::vector<messages::to_units::any>& messages) -> void
+    {
+
+    }
+};
