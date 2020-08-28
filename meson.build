@@ -8,6 +8,8 @@ project('caldeira_exe', 'cpp',
 
 sources = files(
     'src/main.cpp',
+    'src/control_unit.cpp',
+    'src/messages.hpp',
 )
 
 deps = [
