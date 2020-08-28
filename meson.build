@@ -3,7 +3,6 @@ project('caldeira_exe', 'cpp',
     default_options : [
         'cpp_std=c++17',
         'buildtype=debugoptimized',
-        'cpp_eh=none',
     ],
 )
 

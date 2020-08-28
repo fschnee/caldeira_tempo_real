@@ -15,4 +15,6 @@ public:
     {
 
     }
+
+    const int update_speed = 100; // in ms.
 };
