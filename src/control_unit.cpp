@@ -1,13 +1,30 @@
 #include "control_unit.hpp"
 
+control_unit::control_unit() {
+    switch_state(states::initialization);
+}
+
+auto control_unit::process_messages(
+    const std::vector<messages::to_program::any>& messages)
+    -> std::vector<messages::to_units::any>
+{
+    response.clear();
+
+    for(auto& message : messages) {
+        notify_listener_of(message);
+    }
+
+    return response;
+}
+
 auto control_unit::on_init() -> void
 {
-    listen_for<messages::from_units::steam_boiler_waiting>([&](auto msg) {
+    listen_to<messages::from_units::steam_boiler_waiting>([&](auto msg) {
         auto all_ok = false;
         if(all_ok) {
-            to_units.push_back(messages::to_units::program_ready{});
+            response.push_back(messages::to_units::program_ready{});
 
-            listen_for<messages::from_units::physical_units_ready>([&](auto msg){
+            listen_to<messages::from_units::physical_units_ready>([&](auto msg){
                 switch_state(states::normal);
             });
         }
@@ -29,7 +46,7 @@ auto control_unit::on_emergency_stop() -> void
 auto control_unit::switch_state(states newstate) -> void
 {
     state = newstate;
-    handlers.clear();
+    listeners.clear();
 
     switch (state)
     {
@@ -39,17 +56,4 @@ auto control_unit::switch_state(states newstate) -> void
         case states::rescue: {on_rescue();} break;
         case states::emergency_stop: {on_emergency_stop();} break;
     }
-}
-
-auto control_unit::process_messages(
-    const std::vector<messages::to_program::any>& messages)
-    -> std::vector<messages::to_units::any>
-{
-    to_units.clear();
-
-    for(auto& message : messages) {
-        call_handler_for(message);
-    }
-
-    return to_units;
 }
