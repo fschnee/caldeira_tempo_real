@@ -28,14 +28,6 @@ protected:
     template<typename Msg>
     auto notify_listener_of(Msg&& message) -> void;
 
-    enum class states
-    {
-        initialization,
-        normal,
-        degraded,
-        rescue,
-        emergency_stop,
-    };
     // Called when state is entered.
     auto on_init() -> void;
     auto on_normal() -> void;
@@ -45,10 +37,10 @@ protected:
     // The handler map is cleared every time the
     // state changes so make sure to take that into
     // account when writing the ::on_* methods.
-    auto switch_state(states newstate) -> void;
+    auto switch_state(messages::to_units::mode::states newstate) -> void;
 
 private:
-    states state;
+    messages::to_units::mode::states state;
     std::
         map<std::string, std::any, std::less<> /* so we can key using
                                                   string_views*/

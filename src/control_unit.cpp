@@ -1,6 +1,9 @@
 #include "control_unit.hpp"
 
-control_unit::control_unit() { switch_state(states::initialization); }
+control_unit::control_unit()
+{
+    switch_state(messages::to_units::mode::states::initialization);
+}
 
 auto control_unit::process_messages(
     const std::vector<messages::to_program::any>& messages)
@@ -23,7 +26,9 @@ auto control_unit::on_init() -> void
             response.push_back(messages::to_units::program_ready{});
 
             listen_to<messages::from_units::physical_units_ready>(
-                [&](auto msg) { switch_state(states::normal); });
+                [&](auto msg) {
+                    switch_state(messages::to_units::mode::states::normal);
+                });
         }
     });
 }
@@ -36,25 +41,28 @@ auto control_unit::on_rescue() -> void {}
 
 auto control_unit::on_emergency_stop() -> void {}
 
-auto control_unit::switch_state(states newstate) -> void
+auto control_unit::switch_state(messages::to_units::mode::states newstate)
+    -> void
 {
     state = newstate;
     listeners.clear();
 
+    using m = messages::to_units::mode;
+
     switch (state) {
-        case states::initialization: {
+        case m::states::initialization: {
             on_init();
         }; break;
-        case states::normal: {
+        case m::states::normal: {
             on_normal();
         }; break;
-        case states::degraded: {
+        case m::states::degraded: {
             on_degraded();
         }; break;
-        case states::rescue: {
+        case m::states::rescue: {
             on_rescue();
         } break;
-        case states::emergency_stop: {
+        case m::states::emergency_stop: {
             on_emergency_stop();
         } break;
     }

@@ -8,6 +8,17 @@
 namespace messages::to_units {
     using namespace ta;
 
+    struct mode
+    {
+        enum states
+        {
+            initialization,
+            normal,
+            degraded,
+            rescue,
+            emergency_stop,
+        } m;
+    };
     struct program_ready
     {};
     struct valve
@@ -46,6 +57,7 @@ namespace messages::to_units {
     {};
 
     using any = std::variant<
+        mode,
         program_ready,
         valve,
         open_pump,
@@ -158,6 +170,8 @@ namespace messages {
 
 // Some boilerplate to be able to print stuff.
 namespace messages::to_units {
+    auto operator<<(std::ostream& os, const mode::states& val) -> std::ostream&;
+    auto operator<<(std::ostream& os, const mode& val) -> std::ostream&;
     auto operator<<(std::ostream& os, const program_ready& val)
         -> std::ostream&;
     auto operator<<(std::ostream& os, const valve& val) -> std::ostream&;

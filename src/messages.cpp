@@ -1,6 +1,23 @@
 #include "messages.hpp"
 
 namespace messages::to_units {
+    auto operator<<(std::ostream& os, const mode::states& val) -> std::ostream&
+    {
+        static const auto repr[] = {
+            [mode::states::initialization] = "initialization",
+            [mode::states::normal]         = "normal",
+            [mode::states::degraded]       = "degraded",
+            [mode::states::rescue]         = "rescue",
+            [mode::states::emergency_stop] = "emergency_stop",
+        };
+        os << repr[val];
+        return os;
+    }
+    auto operator<<(std::ostream& os, const mode& val) -> std::ostream&
+    {
+        os << "mode{m: " << val.m << '}';
+        return os;
+    }
     auto operator<<(std::ostream& os, const program_ready& val) -> std::ostream&
     {
         os << "program_ready{}";
