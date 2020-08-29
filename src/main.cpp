@@ -2,10 +2,11 @@
 #include <chrono>
 #include <thread>
 
-#include "physical_units.hpp"
 #include "control_unit.hpp"
+#include "physical_units.hpp"
 
-int main() {
+int main()
+{
     namespace ch = std::chrono;
     using namespace std::literals::chrono_literals;
 
@@ -28,22 +29,24 @@ int main() {
         throw_on_timeout();
     };
 
-    while(true) {
+    while (true) {
         auto start = ch::high_resolution_clock::now();
 
         try {
             exchange_messages(start);
 
-            auto end = ch::high_resolution_clock::now();
+            auto end      = ch::high_resolution_clock::now();
             auto duration = ch::duration_cast<ch::milliseconds>(end - start);
-            auto slack = max_cycle_time - duration;
-            std::cout
-                << "OK:            cycle took " << duration.count() << "ms; " 
-                << ch::duration_cast<ch::milliseconds>(slack).count() << "ms of slack\n";
+            auto slack    = max_cycle_time - duration;
+            std::cout << "OK:            cycle took " << duration.count()
+                      << "ms; "
+                      << ch::duration_cast<ch::milliseconds>(slack).count()
+                      << "ms of slack\n";
             std::this_thread::sleep_for(slack);
-        } catch(const ch::high_resolution_clock::time_point& end) {
+        } catch (const ch::high_resolution_clock::time_point& end) {
             auto duration = ch::duration_cast<ch::nanoseconds>(end - start);
-            std::cout << "ERROR_OVERRUN: cycle took " << duration.count() << " nanoseconds\n";
+            std::cout << "ERROR_OVERRUN: cycle took " << duration.count()
+                      << " nanoseconds\n";
         }
     }
 }

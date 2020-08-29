@@ -1,6 +1,7 @@
 ---
 BasedOnStyle: Mozilla
 AccessModifierOffset: '-4'
+AlignAfterOpenBracket: AlwaysBreak
 AlignConsecutiveAssignments: 'true'
 AlignEscapedNewlines: Left
 AllowShortFunctionsOnASingleLine: All
@@ -20,8 +21,9 @@ IncludeBlocks: Preserve
 IndentCaseLabels: 'true'
 IndentWidth: '4'
 Language: Cpp
+NamespaceIndentation: All
 PointerAlignment: Left
-SortIncludes: 'true'
+SortIncludes: 'false'
 Standard: Cpp11
 SpaceBeforeParens: ControlStatements
 UseTab: Never

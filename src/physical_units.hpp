@@ -4,17 +4,14 @@
 
 #include "messages.hpp"
 
-class physical_units {
+class physical_units
+{
 public:
-    auto get_messages() -> std::vector<messages::to_program::any>
-    {
-        return {};
-    }
+    auto get_messages() -> std::vector<messages::to_program::any> { return {}; }
 
-    auto process_messages(const std::vector<messages::to_units::any>& messages) -> void
-    {
-
-    }
+    auto process_messages(const std::vector<messages::to_units::any>& messages)
+        -> void
+    {}
 
     const int update_speed = 100; // in ms.
 };
