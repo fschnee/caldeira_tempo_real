@@ -1,4 +1,4 @@
-project('caldeira_exe', 'cpp',
+project('caldeira', 'cpp',
     version: '0.0.0',
     default_options : [
         'cpp_std=c++17',
