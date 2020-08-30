@@ -10,7 +10,7 @@ int main()
     namespace ch = std::chrono;
     using namespace std::literals::chrono_literals;
 
-    physical_units pu{ .update_speed = 20 };
+    physical_units pu;
     control_unit ctrl;
 
     auto max_cycle_time = 5s;
@@ -46,7 +46,7 @@ int main()
         } catch (const ch::high_resolution_clock::time_point& end) {
             auto duration = ch::duration_cast<ch::nanoseconds>(end - start);
             std::cout << "ERROR_OVERRUN: cycle took " << duration.count()
-                      << " nanoseconds\n";
+                      << "ns\n";
         }
     }
 }

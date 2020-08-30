@@ -7,7 +7,8 @@
 #include <any>
 
 #include "messages.hpp"
-#include "utils.hpp"
+
+#include "limbo/limbo.hpp" // limbo::type_name
 
 /// Summary:
 class control_unit
@@ -54,14 +55,14 @@ template<typename Msg, typename Func>
 auto control_unit::listen_to(Func&& handler) -> void
 {
     listeners.insert(std::make_pair(
-        utils::type_name<utils::remove_cv_ref_t<Msg>>(),
+        limbo::type_name<utils::remove_cv_ref_t<Msg>>(),
         std::function<void(Msg)>{ std::forward<Func>(handler) }));
 }
 
 template<typename Msg>
 auto control_unit::unlisten_to() -> void
 {
-    listeners.erase(utils::type_name<utils::remove_cv_ref_t<Msg>>());
+    listeners.erase(limbo::type_name<utils::remove_cv_ref_t<Msg>>());
 }
 
 template<typename Msg>
@@ -69,7 +70,7 @@ auto control_unit::notify_listener_of(Msg&& message) -> void
 {
     std::visit(
         [&](auto msg) {
-            auto key = utils::type_name<utils::remove_cv_ref_t<Msg>>();
+            auto key = limbo::type_name<utils::remove_cv_ref_t<Msg>>();
 
             if (listeners.count(key)) {
                 auto& any_handler = listeners.find(key)->second;

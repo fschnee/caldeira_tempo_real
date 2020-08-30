@@ -1,21 +1,14 @@
-project('caldeira', 'cpp',
+project('limbo', 'cpp',
     version: '0.0.0',
     default_options : [
         'cpp_std=c++17',
         'buildtype=debugoptimized',
-        'cpp_rtti=false',
     ],
 )
 
-sources = files(
-    'src/main.cpp',
-    'src/control_unit.cpp',
-    'src/messages.cpp',
-)
+incdir = include_directories('src')
 
 deps = [
-    # From a personal project.
-    subproject('limbo').get_variable('limbo_dep')
 ]
 
 warnings = [
@@ -40,9 +33,4 @@ warnings = [
     '-Wformat=2', # warn on security issues around functions that format output (ie printf)
 ]
 
-caldeira_exe = executable(
-    'caldeira',
-    sources,
-    dependencies: deps,
-    link_args: warnings
-)
+limbo_dep = declare_dependency(include_directories: incdir, dependencies: deps, link_args: warnings)
