@@ -1,0 +1,19 @@
+# ninja log v5
+0	424	1599618823369286643	subprojects/libboiler/liblibboiler.so.p/src_messages.cpp.o	edf3bfbc9c943cc2
+1	613	1599618823557290509	tests/ctrl_test.p/ctrl.cpp.o	175584f764a0bb2e
+1	754	1599618823697293388	tests/print_message_test.p/print_message.cpp.o	df51759fa58550d6
+1	775	1599618823721293881	caldeira.p/src_main.cpp.o	7b239063f4f8b116
+0	1754	1599618824697313950	subprojects/libboiler/liblibboiler.so.p/src_control_unit.cpp.o	36eecf437f6226cc
+1754	1825	1599618824769315430	subprojects/libboiler/liblibboiler.so	6c47137696640357
+1825	2026	1599618824937318885	subprojects/libboiler/liblibboiler.so.p/liblibboiler.so.symbols	697be5685558386a
+2026	2094	1599618825037320941	caldeira	5d01247da0676fcc
+2027	2107	1599618825053321270	tests/ctrl_test	9f9d428e1054858f
+2027	2110	1599618825057321352	tests/print_message_test	cb181a6e1d2153e8
+0	1655	1599618846029752641	subprojects/libboiler/liblibboiler.so.p/src_control_unit.cpp.o	36eecf437f6226cc
+1655	1708	1599618846081753711	subprojects/libboiler/liblibboiler.so	6c47137696640357
+1708	1896	1599618846245757084	subprojects/libboiler/liblibboiler.so.p/liblibboiler.so.symbols	697be5685558386a
+1896	1946	1599618846317758565	tests/print_message_test	cb181a6e1d2153e8
+1896	1958	1599618846329758812	tests/ctrl_test	9f9d428e1054858f
+1896	1963	1599618846337758976	caldeira	5d01247da0676fcc
+2	594	1599619025969456827	tests/ctrl_test.p/ctrl.cpp.o	175584f764a0bb2e
+1	741	1599619026117459876	caldeira.p/src_main.cpp.o	7b239063f4f8b116

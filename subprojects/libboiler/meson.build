@@ -1,12 +1,22 @@
-project('limbo', 'cpp',
+project('libboiler', 'cpp',
+    meson_version: '>= 0.53.0',
     version: '0.0.0',
     default_options : [
-        'cpp_std=c++17',
+        'cpp_std=c++2a',
         'buildtype=debugoptimized',
     ],
 )
 
+sources = files(
+    'src/control_unit.cpp',
+    'src/messages.cpp',
+)
+
 incdir = include_directories('include')
+
+deps = [
+    subproject('limbo').get_variable('limbo_dep'),
+]
 
 warnings = [
     '-Wall', # reasonable and standard
@@ -30,4 +40,5 @@ warnings = [
     '-Wformat=2', # warn on security issues around functions that format output (ie printf)
 ]
 
-limbo_dep = declare_dependency(include_directories: incdir, link_args: warnings)
+libboiler_lib = library('libboiler', sources, dependencies: deps, include_directories: incdir, link_args: warnings)
+libboiler_dep = declare_dependency(dependencies: deps, include_directories: incdir, link_args: warnings, link_with: libboiler_lib)

@@ -2,7 +2,7 @@
 
 #include <type_traits>
 
-namespace utils {
+namespace boiler::utils {
     template<typename T>
     struct remove_cv_ref
     {

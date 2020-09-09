@@ -5,8 +5,7 @@
 #include <utility>     // std::integer_sequence.
 
 /// Summary:
-namespace limbo::ppu
-{
+namespace limbo::ppu {
     // Not a full-fledged type_list, just somewhere
     // to ::append and ::recover types from.
     template<typename... Types>
@@ -64,7 +63,8 @@ namespace limbo::ppu
         // -1 is the last type and -sizeof...(Types) is the first.
         template<long long Index>
         using get =
-            typename nth_type<(Index >= 0 ? Index : sizeof...(Types) + Index), Types...>::type;
+            typename nth_type<(Index >= 0 ? Index : sizeof...(Types) + Index), Types...>::
+                type;
     };
 
     // Result doesn't include the Index'th type.
@@ -111,7 +111,8 @@ namespace limbo::ppu
 
             // Has ::on<bool>, ::on_true, ::on_false and the
             // aliases ::when<bool>, ::when_true and ::when_false.
-            // Recover to integer_accumulator<std::size_t, ...> using any of those.
+            // Recover to integer_accumulator<std::size_t, ...> using any of
+            // those.
             struct accumulating_the_indexes;
             // Just some aliases.
             using to_accumulate_the_indexes = accumulating_the_indexes;
@@ -163,23 +164,23 @@ namespace limbo::ppu
 /// TODO: make cleaner all-around.
 namespace limbo::ppu /* A.K.A parameter_pack_utils */
 {
-    namespace detail
-    {
+    namespace detail {
         // Recursive case.
         template<typename IntegralConstant>
         struct make_integer_accumulator_helper
         {
             using current = IntegralConstant;
 
-            static const auto next_value = current::value > typename current::value_type{ 0 }
-                                               ? current::value - 1
-                                               : current::value == typename current::value_type{ 0 }
-                                                     ? typename current::value_type{ 0 }
-                                                     : current::value + 1;
+            static const auto next_value =
+                current::value > typename current::value_type{ 0 }
+                    ? current::value - 1
+                    : current::value == typename current::value_type{ 0 }
+                          ? typename current::value_type{ 0 }
+                          : current::value + 1;
 
             using type = typename make_integer_accumulator_helper<
-                std::integral_constant<typename current::value_type,
-                                       next_value>>::type ::template append<current::value>;
+                std::integral_constant<typename current::value_type, next_value>>::type ::
+                template append<current::value>;
         };
         // Base case.
         template<typename IntegerType>
@@ -195,11 +196,12 @@ namespace limbo::ppu /* A.K.A parameter_pack_utils */
     {
         using current = std::integral_constant<IntegerType, CurrentInt>;
 
-        static const auto next_value = current::value > typename current::value_type{ 0 }
-            ? current::value - 1
-            : current::value == typename current::value_type{ 0 }
-                ? typename current::value_type{ 0 }
-                : current::value + 1;
+        static const auto next_value =
+            current::value > typename current::value_type{ 0 }
+                ? current::value - 1
+                : current::value == typename current::value_type{ 0 }
+                      ? typename current::value_type{ 0 }
+                      : current::value + 1;
 
         using type = typename std::conditional_t<
             current::value == typename current::value_type{ 0 },
@@ -210,8 +212,8 @@ namespace limbo::ppu /* A.K.A parameter_pack_utils */
     template<typename IntegerType, IntegerType Begin, IntegerType End>
     struct make_integer_accumulator_range
     {
-        using type =
-            typename make_integer_accumulator<IntegerType, End - Begin>::type::template add<Begin>;
+        using type = typename make_integer_accumulator<IntegerType, End - Begin>::type::
+            template add<Begin>;
     };
 
     // Pops one type at a time from the pack.
@@ -233,9 +235,8 @@ namespace limbo::ppu /* A.K.A parameter_pack_utils */
     {
         static_assert(Index < sizeof...(Types), "Index out of bounds");
 
-        using type =
-            typename make_integer_accumulator<std::size_t, Index>::type ::template apply_type<
-                accessors_for<Types...>::template at>;
+        using type = typename make_integer_accumulator<std::size_t, Index>::type ::
+            template apply_type<accessors_for<Types...>::template at>;
     };
     template<typename... Types>
     struct types_before<0, Types...>
@@ -248,19 +249,21 @@ namespace limbo::ppu /* A.K.A parameter_pack_utils */
     {
         static_assert(Index < sizeof...(Types), "Index out of bounds");
 
-        using type =
-            typename make_integer_accumulator_range<std::size_t, Index + 1, sizeof...(Types)>::
-                type ::template apply_type<accessors_for<Types...>::template at>;
+        using type = typename make_integer_accumulator_range<
+            std::size_t,
+            Index + 1,
+            sizeof...(
+                Types)>::type ::template apply_type<accessors_for<Types...>::template at>;
     };
 
     template<typename... Types>
     struct reverse
     {
-        using type =
-            typename make_integer_accumulator_range<long long,
-                                                    -1,
-                                                    -static_cast<long long>(sizeof...(Types) + 1)>::
-                type ::template apply_type<accessors_for<Types...>::template get>;
+        using type = typename make_integer_accumulator_range<
+            long long,
+            -1,
+            -static_cast<long long>(sizeof...(Types) + 1)>::type ::
+            template apply_type<accessors_for<Types...>::template get>;
     };
     template<>
     struct reverse<>
@@ -268,70 +271,74 @@ namespace limbo::ppu /* A.K.A parameter_pack_utils */
         using type = type_accumulator<>;
     };
 
-    namespace detail
-    {
-        template<template<typename> typename Pred,
-                 bool InvertPred,
-                 typename Accumulator,
-                 typename CurrentType,
-                 typename... Rest>
+    namespace detail {
+        template<
+            template<typename>
+            typename Pred,
+            bool InvertPred,
+            typename Accumulator,
+            typename CurrentType,
+            typename... Rest>
         constexpr static auto recurse_with_pred_getting_types()
         {
             constexpr auto should_append_to_accumulator =
                 InvertPred ? !Pred<CurrentType>::value : Pred<CurrentType>::value;
-            using accumulator =
-                std::conditional_t<should_append_to_accumulator,
-                                   typename Accumulator::template append<CurrentType>,
-                                   Accumulator>;
+            using accumulator = std::conditional_t<
+                should_append_to_accumulator,
+                typename Accumulator::template append<CurrentType>,
+                Accumulator>;
 
             constexpr auto should_end_recursion = sizeof...(Rest) == 0;
-            if constexpr (should_end_recursion)
-            {
+            if constexpr (should_end_recursion) {
                 return accumulator{};
-            }
-            else
-            {
-                return recurse_with_pred_getting_types<Pred, InvertPred, accumulator, Rest...>();
+            } else {
+                return recurse_with_pred_getting_types<
+                    Pred,
+                    InvertPred,
+                    accumulator,
+                    Rest...>();
             }
         }
-        template<template<typename> typename Pred,
-                 bool InvertPred,
-                 typename Accumulator,
-                 std::size_t CurrentIndex,
-                 typename CurrentType,
-                 typename... Rest>
+        template<
+            template<typename>
+            typename Pred,
+            bool InvertPred,
+            typename Accumulator,
+            std::size_t CurrentIndex,
+            typename CurrentType,
+            typename... Rest>
         constexpr static auto recurse_with_pred_getting_indexes()
         {
             constexpr auto should_append_to_accumulator =
                 InvertPred ? !Pred<CurrentType>::value : Pred<CurrentType>::value;
-            using accumulator =
-                std::conditional_t<should_append_to_accumulator,
-                                   typename Accumulator::template append<CurrentIndex>,
-                                   Accumulator>;
+            using accumulator = std::conditional_t<
+                should_append_to_accumulator,
+                typename Accumulator::template append<CurrentIndex>,
+                Accumulator>;
 
             constexpr auto should_end_recursion = sizeof...(Rest) == 0;
-            if constexpr (should_end_recursion)
-            {
+            if constexpr (should_end_recursion) {
                 return accumulator{};
-            }
-            else
-            {
-                return recurse_with_pred_getting_indexes<Pred,
-                                                         InvertPred,
-                                                         accumulator,
-                                                         CurrentIndex + 1,
-                                                         Rest...>();
+            } else {
+                return recurse_with_pred_getting_indexes<
+                    Pred,
+                    InvertPred,
+                    accumulator,
+                    CurrentIndex + 1,
+                    Rest...>();
             }
         }
     } // namespace detail
     template<typename... Types>
     template<template<typename> typename Pred>
-    struct iterate_through<Types...>::using_condition<Pred>::accumulating_the_types {
+    struct iterate_through<Types...>::using_condition<Pred>::accumulating_the_types
+    {
         template<bool Cond>
-        using on       = decltype(detail::recurse_with_pred_getting_types<Pred,
-                                                                    !Cond,
-                                                                    type_accumulator<>,
-                                                                    Types...>());
+        using on       = decltype(detail::recurse_with_pred_getting_types<
+                            Pred,
+                            !Cond,
+                            type_accumulator<>,
+                            Types...>());
         using on_true  = on<true>;
         using on_false = on<false>;
         template<bool Cond>
@@ -341,15 +348,16 @@ namespace limbo::ppu /* A.K.A parameter_pack_utils */
     };
     template<typename... Types>
     template<template<typename> typename Pred>
-    struct iterate_through<Types...>::using_condition<Pred>::accumulating_the_indexes {
+    struct iterate_through<Types...>::using_condition<Pred>::accumulating_the_indexes
+    {
         template<bool Cond>
         using on =
             typename decltype(detail::recurse_with_pred_getting_indexes<
-                                Pred,
-                                !Cond,
-                                integer_accumulator<std::size_t>,
-                                0,
-                                Types...>())::template recover_to<std::integer_sequence>;
+                              Pred,
+                              !Cond,
+                              integer_accumulator<std::size_t>,
+                              0,
+                              Types...>())::template recover_to<std::integer_sequence>;
         using on_true  = on<true>;
         using on_false = on<false>;
         template<bool Cond>

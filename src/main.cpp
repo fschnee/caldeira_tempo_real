@@ -2,16 +2,17 @@
 #include <chrono>
 #include <thread>
 
-#include "control_unit.hpp"
-#include "physical_units.hpp"
+#include "boiler/common.hpp"
+#include "boiler/control_unit.hpp"
+#include "boiler/physical_units.hpp"
 
 int main()
 {
     namespace ch = std::chrono;
     using namespace std::literals::chrono_literals;
-
-    physical_units pu;
-    control_unit ctrl;
+    auto constants = boiler::constants{};
+    boiler::physical_units pu;
+    boiler::control_unit ctrl{ constants };
 
     auto max_cycle_time = 5s;
 
@@ -50,3 +51,5 @@ int main()
         }
     }
 }
+
+

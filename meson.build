@@ -1,21 +1,14 @@
 project('caldeira', 'cpp',
+    meson_version: '>= 0.53.0',
     version: '0.0.0',
     default_options : [
-        'cpp_std=c++17',
+        'cpp_std=c++2a',
         'buildtype=debugoptimized',
-        'cpp_rtti=false',
     ],
 )
 
-sources = files(
-    'src/main.cpp',
-    'src/control_unit.cpp',
-    'src/messages.cpp',
-)
-
 deps = [
-    # From a personal project.
-    subproject('limbo').get_variable('limbo_dep')
+    subproject('libboiler').get_variable('libboiler_dep')
 ]
 
 warnings = [
@@ -42,7 +35,9 @@ warnings = [
 
 caldeira_exe = executable(
     'caldeira',
-    sources,
+    files('src/main.cpp'),
     dependencies: deps,
     link_args: warnings
 )
+
+subdir('tests')

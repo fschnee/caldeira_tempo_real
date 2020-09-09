@@ -3,24 +3,24 @@
 #include <ostream>
 #include <variant>
 
-#include "utils.hpp"
-#include "type_aliases.hpp"
+#include "boiler/utils.hpp"
+#include "boiler/type_aliases.hpp"
 
 #include "limbo/type_list.hpp"
 #include "limbo/limbo.hpp" // limbo::type_name.
 
-namespace messages::to_units {
+namespace boiler::messages::to_units {
     using namespace ta;
 
     struct mode
     {
-        enum states
+        enum class possible_modes
         {
-            initialization = 0,
-            normal         = 1,
-            degraded       = 2,
-            rescue         = 3,
-            emergency_stop = 4,
+            initialization,
+            normal,
+            degraded,
+            rescue,
+            emergency_stop,
         } m;
     };
     struct program_ready
@@ -77,7 +77,7 @@ namespace messages::to_units {
     using any = types::recover_to<std::variant>;
 }
 
-namespace messages::to_program {
+namespace boiler::messages::to_program {
     using namespace ta;
 
     struct stop
@@ -89,7 +89,7 @@ namespace messages::to_program {
     struct pump_state
     {
         u8 n;
-        enum /*class*/ possible_states : bool
+        enum class possible_states : bool
         {
             open   = true,
             closed = false
@@ -98,7 +98,7 @@ namespace messages::to_program {
     struct pump_control_state
     {
         u8 n;
-        enum /*class*/ possible_states : bool
+        enum class possible_states : bool
         {
             flowing     = true,
             not_flowing = false
@@ -156,24 +156,79 @@ namespace messages::to_program {
     using any = types::recover_to<std::variant>;
 }
 
+// Registering specific aknowledgement pairs.
+namespace boiler::messages {
+    template<typename Msg>
+    struct acknowledgement_of
+    {
+        using type = limbo::nonesuch;
+    };
+
+    template<>
+    struct acknowledgement_of<to_units::program_ready>
+    {
+        using type = to_program::physical_units_ready;
+    };
+    template<>
+    struct acknowledgement_of<to_units::pump_failure_detection>
+    {
+        using type = to_program::pump_failure_acknowledgement;
+    };
+    template<>
+    struct acknowledgement_of<to_units::pump_control_failure_detection>
+    {
+        using type = to_program::pump_control_failure_acknowledgement;
+    };
+    template<>
+    struct acknowledgement_of<to_units::level_failure_detection>
+    {
+        using type = to_program::level_failure_acknowledgment;
+    };
+    template<>
+    struct acknowledgement_of<to_units::steam_failure_detection>
+    {
+        using type = to_program::steam_outcome_failure_acknowledgment;
+    };
+
+    template<>
+    struct acknowledgement_of<to_program::pump_repaired>
+    {
+        using type = to_units::pump_repaired_acknowledgement;
+    };
+    template<>
+    struct acknowledgement_of<to_program::pump_control_repaired>
+    {
+        using type = to_units::pump_control_repaired_acknowledgement;
+    };
+    template<>
+    struct acknowledgement_of<to_program::level_repaired>
+    {
+        using type = to_units::level_repaired_acknowledgement;
+    };
+    template<>
+    struct acknowledgement_of<to_program::steam_repaired>
+    {
+        using type = to_units::steam_repaired_acknowledgement;
+    };
+}
+
 // Just some aliases.
-namespace messages {
+namespace boiler::messages {
     namespace from_program = to_units;
     namespace from_units   = to_program;
 }
 
 // Stuff for printing.
-namespace messages::to_units {
-    auto operator<<(std::ostream& os, const mode::states& val) -> std::ostream&;
+namespace boiler::messages::to_units {
+    auto operator<<(std::ostream& os, const mode::possible_modes& val) -> std::ostream&;
 }
-namespace messages::to_program {
+namespace boiler::messages::to_program {
     auto operator<<(std::ostream& os, const pump_state::possible_states& val)
         -> std::ostream&;
-    auto operator<<(
-        std::ostream& os,
-        const pump_control_state::possible_states& val) -> std::ostream&;
+    auto operator<<(std::ostream& os, const pump_control_state::possible_states& val)
+        -> std::ostream&;
 }
-namespace messages {
+namespace boiler::messages {
     // Spooky template wizardry.
     namespace detection_exprs {
         template<typename T>
@@ -185,16 +240,15 @@ namespace messages {
         template<typename T>
         using has_liters_expr = decltype(std::declval<T>().liters);
         template<typename T>
-        using has_liters_per_sec_expr =
-            decltype(std::declval<T>().liters_per_sec);
+        using has_liters_per_sec_expr = decltype(std::declval<T>().liters_per_sec);
     }
 
     // General overload, ::to_units and ::to_program defer to this, see below.
     template<
         typename MsgType,
         typename = std::enable_if_t<
-            to_program::types::contains<utils::remove_cv_ref_t<MsgType>> ||
-            to_units::types::contains<utils::remove_cv_ref_t<MsgType>>>>
+            to_program::types::contains<boiler::utils::remove_cv_ref_t<MsgType>> ||
+            to_units::types::contains<boiler::utils::remove_cv_ref_t<MsgType>>>>
     auto operator<<(std::ostream& os, MsgType&& msg) -> std::ostream&
     {
         using namespace ta;
@@ -232,33 +286,23 @@ namespace messages {
 
         if constexpr (has_member[(u32)members::n]) {
             os << "n: " << u16{ msg.n };
-            if constexpr (has_member_after(members::n)) {
-                os << ", ";
-            }
+            if constexpr (has_member_after(members::n)) { os << ", "; }
         }
         if constexpr (has_member[(u32)members::m]) {
             os << "m: " << msg.m;
-            if constexpr (has_member_after(members::m)) {
-                os << ", ";
-            }
+            if constexpr (has_member_after(members::m)) { os << ", "; }
         }
         if constexpr (has_member[(u32)members::state]) {
             os << "state: " << msg.state;
-            if constexpr (has_member_after(members::state)) {
-                os << ", ";
-            }
+            if constexpr (has_member_after(members::state)) { os << ", "; }
         }
         if constexpr (has_member[(u32)members::liters]) {
             os << "liters: " << msg.liters;
-            if constexpr (has_member_after(members::liters)) {
-                os << ", ";
-            }
+            if constexpr (has_member_after(members::liters)) { os << ", "; }
         }
         if constexpr (has_member[(u32)members::liters_per_sec]) {
             os << "liters_per_sec: " << msg.liters_per_sec;
-            if constexpr (has_member_after(members::liters_per_sec)) {
-                os << ", ";
-            }
+            if constexpr (has_member_after(members::liters_per_sec)) { os << ", "; }
         }
 
         os << '}';
